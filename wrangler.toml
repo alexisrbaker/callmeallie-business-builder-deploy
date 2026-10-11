@@ -1,7 +1,6 @@
 name = "call-me-allie-business"
 main = "@astrojs/cloudflare/entrypoints/server"
 compatibility_date = "2026-10-10"
-compatibility_flags = ["nodejs_compat"]
 
 [assets]
 directory = "./dist"
@@ -9,10 +8,9 @@ binding = "STATIC_ASSETS"
 
 [[d1_databases]]
 binding = "DB"
-database_name = "business-builder-db"
-database_id = "placeholder-for-deploy-button"
+database_name = "call-me-allie-business"
 migrations_dir = "migrations"
 
 [[r2_buckets]]
 binding = "ASSETS"
-bucket_name = "business-builder-files"
+bucket_name = "call-me-allie-business-assets"

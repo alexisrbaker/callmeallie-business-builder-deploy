@@ -3,21 +3,9 @@
   "type": "module",
   "version": "0.14.0",
   "private": true,
-  "engines": {
-    "node": ">=22.12.0"
-  },
-  "scripts": {
-    "dev": "astro dev",
-    "build": "astro build",
-    "preview": "astro preview",
-    "deploy": "wrangler deploy && wrangler d1 migrations apply DB --remote",
-    "db:migrations:apply": "wrangler d1 migrations apply DB --remote"
-  },
-  "dependencies": {
-    "astro": "^6.4.7"
-  },
-  "devDependencies": {
-    "@astrojs/cloudflare": "^13.7.0",
-    "wrangler": "^4.101.0"
-  }
+  "engines": {"node": ">=22.12.0"},
+  "scripts": {"dev":"astro dev","build":"astro build","preview":"astro preview","deploy":"npm run build && wrangler deploy && wrangler d1 migrations apply DB --remote","deploy:allie":"npm run build && wrangler deploy --config wrangler.allie.toml && wrangler d1 migrations apply DB --remote --config wrangler.allie.toml"},
+  "dependencies":{"astro":"^6.4.7"},
+  "overrides":{"vite":"^7"},
+  "devDependencies":{"@astrojs/cloudflare":"^13.7.0","wrangler":"^4.101.0"}
 }
