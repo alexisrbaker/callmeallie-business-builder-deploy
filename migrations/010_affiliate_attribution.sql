@@ -1,3 +1,4 @@
+-- Allie-only persistent affiliate attribution. Exclude from distributable starter builds.
 ALTER TABLE affiliate_attributions ADD COLUMN user_id TEXT;
 ALTER TABLE affiliate_attributions ADD COLUMN claimed_at TEXT;
 ALTER TABLE affiliate_attributions ADD COLUMN last_seen_at TEXT;
