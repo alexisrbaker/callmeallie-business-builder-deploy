@@ -1,0 +1,1 @@
+import{dbFrom}from'../../../lib/db.js';import{logoutUser}from'../../../lib/auth.js';export const POST=async({request,locals})=>{const db=dbFrom(locals);const cookie=await logoutUser(db,request,locals);return new Response(null,{status:303,headers:{Location:'/','Set-Cookie':cookie}})};
