@@ -1,0 +1,5 @@
+---
+import '../styles/site.css';
+const aff=Astro.url.searchParams.get('aff')||'';
+---
+<main><a href="/">← Home</a><h1>Business Builder Library</h1><p>Access all 46 interactive guides, with personalized navigation and downloadable guides as available.</p><p>$46 one-time purchase.</p><form method="post" action="/api/checkout/library"><input type="hidden" name="aff" value={aff}/><button>Continue to secure checkout</button></form></main>
