@@ -1,0 +1,2 @@
+import{dbFrom,getSetting}from'../../../lib/db.js';import{getCurrentUser}from'../../../lib/auth.js';
+export const POST=async({request,locals})=>{const db=dbFrom(locals),u=await getCurrentUser(db,request,locals);if(!u)return Response.redirect(new URL('/login?next=/mrr',request.url),303);const price=await getSetting(db,'business_builder_mrr_stripe_price_id');if(!price)return new Response('MRR checkout is not configured yet.',{status:503});return Response.redirect(new URL('/mrr?checkout=ready',request.url),303)};
