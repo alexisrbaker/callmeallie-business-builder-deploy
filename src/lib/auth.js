@@ -1,0 +1,3 @@
+import { dbFrom, identityDbFrom } from './db.js';
+export function authDb(locals){return identityDbFrom(locals)||dbFrom(locals)}
+export async function currentUser(locals,cookies){const db=authDb(locals);const sid=cookies.get('allie_session_v2')?.value;if(!db||!sid)return null;return await db.prepare("SELECT u.id,u.email,u.display_name FROM sessions s JOIN users u ON u.id=s.user_id WHERE s.id=? AND s.expires_at>CURRENT_TIMESTAMP AND u.status='active' LIMIT 1").bind(sid).first();}
