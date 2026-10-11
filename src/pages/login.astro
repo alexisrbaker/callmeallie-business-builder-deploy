@@ -1,0 +1,5 @@
+---
+import '../styles/site.css';
+const next=Astro.url.searchParams.get('next')||'/account';
+---
+<main><a href="/">← Home</a><h1>Sign in</h1><form class="card" method="post" action="/api/auth/login"><input type="hidden" name="next" value={next}><label>Email<input name="email" type="email" required></label><label>Password<input name="password" type="password" required></label><button>Sign in</button></form><p>Need an account? <a href="/register">Create one</a>.</p></main>
