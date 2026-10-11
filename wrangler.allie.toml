@@ -1,0 +1,22 @@
+name = "allie-business"
+main = "@astrojs/cloudflare/entrypoints/server"
+compatibility_date = "2026-10-10"
+
+[assets]
+directory = "./dist"
+binding = "STATIC_ASSETS"
+
+[[d1_databases]]
+binding = "DB"
+database_name = "allie-business-db"
+database_id = "dd86ee9e-638d-410c-83d4-6daca9bf58f1"
+migrations_dir = "migrations"
+
+[[d1_databases]]
+binding = "IDENTITY_DB"
+database_name = "allie-fiction-db"
+database_id = "72f7d68c-7ed9-4842-8031-55b8cdff8dc7"
+
+[[r2_buckets]]
+binding = "ASSETS"
+bucket_name = "allie-business-assets"
