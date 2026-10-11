@@ -1,0 +1,8 @@
+PRAGMA foreign_keys = ON;
+CREATE TABLE IF NOT EXISTS users(id TEXT PRIMARY KEY,email TEXT NOT NULL UNIQUE,display_name TEXT,password_hash TEXT,status TEXT NOT NULL DEFAULT 'active',created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP);
+CREATE TABLE IF NOT EXISTS sessions(id TEXT PRIMARY KEY,user_id TEXT NOT NULL,expires_at TEXT NOT NULL,created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,FOREIGN KEY(user_id) REFERENCES users(id));
+CREATE TABLE IF NOT EXISTS site_settings(key TEXT PRIMARY KEY,value TEXT,updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP);
+CREATE TABLE IF NOT EXISTS products(id TEXT PRIMARY KEY,slug TEXT NOT NULL UNIQUE,name TEXT NOT NULL,product_type TEXT NOT NULL,status TEXT NOT NULL DEFAULT 'draft',price_cents INTEGER,currency TEXT NOT NULL DEFAULT 'usd',created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP);
+CREATE TABLE IF NOT EXISTS orders(id TEXT PRIMARY KEY,user_id TEXT,product_id TEXT NOT NULL,provider TEXT NOT NULL DEFAULT 'stripe',provider_payment_id TEXT,amount_cents INTEGER NOT NULL,currency TEXT NOT NULL DEFAULT 'usd',status TEXT NOT NULL,created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,FOREIGN KEY(user_id) REFERENCES users(id),FOREIGN KEY(product_id) REFERENCES products(id));
+CREATE TABLE IF NOT EXISTS entitlements(id TEXT PRIMARY KEY,user_id TEXT NOT NULL,entitlement_key TEXT NOT NULL,source_type TEXT NOT NULL,source_id TEXT,status TEXT NOT NULL DEFAULT 'active',starts_at TEXT,ends_at TEXT,created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,FOREIGN KEY(user_id) REFERENCES users(id));
+CREATE INDEX IF NOT EXISTS idx_entitlements_user_key ON entitlements(user_id,entitlement_key,status);
