@@ -1,0 +1,5 @@
+---
+import '../styles/site.css';
+const next=Astro.url.searchParams.get('next')||'/account';
+---
+<main><a href="/">← Home</a><h1>Create account</h1><p>You can use a free account to keep quiz history. Purchases and other capabilities attach to this same account later.</p><form class="card" method="post" action="/api/auth/register"><input type="hidden" name="next" value={next}><label>Name<input name="name" autocomplete="name"></label><label>Email<input name="email" type="email" required autocomplete="email"></label><label>Password<input name="password" type="password" minlength="10" required autocomplete="new-password"></label><button>Create account</button></form></main>
