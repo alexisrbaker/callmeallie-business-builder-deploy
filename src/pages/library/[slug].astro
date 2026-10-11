@@ -1,7 +1,8 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import { guides } from '../../data/guides.js';
+export const prerender = true;
 export function getStaticPaths(){return guides.map(g=>({params:{slug:g.slug},props:{guide:g}}));}
 const {guide}=Astro.props;
 ---
-<BaseLayout title={guide.title}><p class="muted">GUIDE {guide.number} OF 46</p><h1>{guide.title}</h1><div class="card"><p>The canonical guide manuscript is being attached to this route. The web version and downloadable PDF will come from the same source so the two copies cannot drift apart.</p></div><p><a href="/library">← Back to the decision tree</a></p></BaseLayout>
+<BaseLayout title={guide.title}><p class="muted">GUIDE {guide.number} OF 46</p><h1>{guide.title}</h1><div class="card"><p>Guide content is not yet loaded. This deployment is a technical preview, not the finished customer library.</p></div><p><a href="/library/">← Back to the decision tree</a></p></BaseLayout>
