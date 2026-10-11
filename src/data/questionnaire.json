@@ -1,0 +1,418 @@
+{
+  "id": "business-direction",
+  "version": "2.1",
+  "questions": [
+    {
+      "id": "q1",
+      "position": 1,
+      "text": "How soon would you like this business to have a realistic chance of making money?",
+      "options": [
+        {
+          "id": "A",
+          "text": "As soon as reasonably possible. I would rather start with something I can sell without months of development."
+        },
+        {
+          "id": "B",
+          "text": "I can spend a few weeks getting something ready if it gives me a better fit."
+        },
+        {
+          "id": "C",
+          "text": "I am comfortable spending a few months building or developing something before I sell it."
+        },
+        {
+          "id": "D",
+          "text": "I am willing to take a longer path if it means creating something I really want to own."
+        },
+        {
+          "id": "E",
+          "text": "I am not sure."
+        }
+      ]
+    },
+    {
+      "id": "q2",
+      "position": 2,
+      "text": "How much money are you comfortable putting into a business before you know whether customers will actually buy?",
+      "options": [
+        {
+          "id": "A",
+          "text": "As close to $0 as possible."
+        },
+        {
+          "id": "B",
+          "text": "A few hundred dollars."
+        },
+        {
+          "id": "C",
+          "text": "Around $1,000 to a few thousand dollars if the idea makes sense."
+        },
+        {
+          "id": "D",
+          "text": "I am comfortable making a larger investment for the right opportunity."
+        },
+        {
+          "id": "E",
+          "text": "I am not sure yet."
+        }
+      ]
+    },
+    {
+      "id": "q3",
+      "position": 3,
+      "text": "Realistically, how much time can you give this business most weeks?",
+      "options": [
+        {
+          "id": "A",
+          "text": "Less than 5 hours."
+        },
+        {
+          "id": "B",
+          "text": "About 5 to 10 hours."
+        },
+        {
+          "id": "C",
+          "text": "About 10 to 20 hours."
+        },
+        {
+          "id": "D",
+          "text": "More than 20 hours."
+        },
+        {
+          "id": "E",
+          "text": "It varies so much that I need something flexible."
+        }
+      ]
+    },
+    {
+      "id": "q4",
+      "position": 4,
+      "text": "How involved would you like to be with customers personally?",
+      "options": [
+        {
+          "id": "A",
+          "text": "Very little. I would rather the product do most of the work."
+        },
+        {
+          "id": "B",
+          "text": "Some interaction is fine, but I do not want customers depending heavily on me."
+        },
+        {
+          "id": "C",
+          "text": "I like working directly with people and helping them get a result."
+        },
+        {
+          "id": "D",
+          "text": "Personal interaction is one of the parts I would enjoy most."
+        },
+        {
+          "id": "E",
+          "text": "I am not sure."
+        }
+      ]
+    },
+    {
+      "id": "q5",
+      "position": 5,
+      "text": "Imagine you suddenly make 100 sales instead of 10. What would you most want to happen to your workload?",
+      "options": [
+        {
+          "id": "A",
+          "text": "I want the extra sales to create very little extra work."
+        },
+        {
+          "id": "B",
+          "text": "Some extra work is fine, but I do not want my workload to grow anywhere near ten times."
+        },
+        {
+          "id": "C",
+          "text": "I am comfortable doing substantially more work if I am making substantially more money."
+        },
+        {
+          "id": "D",
+          "text": "I would rather serve fewer customers personally and potentially charge more for that involvement."
+        },
+        {
+          "id": "E",
+          "text": "I have not thought about this."
+        }
+      ]
+    },
+    {
+      "id": "q6",
+      "position": 6,
+      "text": "Which sounds most appealing?",
+      "options": [
+        {
+          "id": "A",
+          "text": "I would rather start by selling or recommending something that already exists."
+        },
+        {
+          "id": "B",
+          "text": "I like the idea of taking an existing kind of product and creating my own version of it."
+        },
+        {
+          "id": "C",
+          "text": "I want to create something from my own knowledge, skills, or creativity."
+        },
+        {
+          "id": "D",
+          "text": "I would love to create something genuinely new that does not already exist."
+        },
+        {
+          "id": "E",
+          "text": "I am not sure."
+        }
+      ]
+    },
+    {
+      "id": "q7",
+      "position": 7,
+      "text": "If both had equal income potential, which sounds more appealing to work with?",
+      "options": [
+        {
+          "id": "A",
+          "text": "Digital products or experiences. I like the idea of little or no physical inventory."
+        },
+        {
+          "id": "B",
+          "text": "Physical products. I like the idea of selling something tangible."
+        },
+        {
+          "id": "C",
+          "text": "I could happily do either."
+        },
+        {
+          "id": "D",
+          "text": "I like businesses that combine physical and digital elements."
+        },
+        {
+          "id": "E",
+          "text": "I am not sure."
+        }
+      ]
+    },
+    {
+      "id": "q8",
+      "position": 8,
+      "text": "How do you feel about buying, storing, packing, making, or otherwise handling physical products?",
+      "options": [
+        {
+          "id": "A",
+          "text": "I want as little of that as possible."
+        },
+        {
+          "id": "B",
+          "text": "I could handle a small amount if the business made sense."
+        },
+        {
+          "id": "C",
+          "text": "I am comfortable with inventory and physical fulfillment."
+        },
+        {
+          "id": "D",
+          "text": "Making or handling the product myself actually sounds enjoyable."
+        },
+        {
+          "id": "E",
+          "text": "I am not sure."
+        }
+      ]
+    },
+    {
+      "id": "q9",
+      "position": 9,
+      "text": "You find a product people genuinely want. Which situation sounds best?",
+      "options": [
+        {
+          "id": "A",
+          "text": "I want to own and control the product, even if that means I am responsible for more of the business."
+        },
+        {
+          "id": "B",
+          "text": "I would rather another company handle the product and much of the infrastructure while I focus on connecting customers with it."
+        },
+        {
+          "id": "C",
+          "text": "I want something in between: a product that is mine without having to personally manufacture everything."
+        },
+        {
+          "id": "D",
+          "text": "I care more about whether the opportunity works for me than who technically owns the product."
+        },
+        {
+          "id": "E",
+          "text": "I am not sure."
+        }
+      ]
+    },
+    {
+      "id": "q10",
+      "position": 10,
+      "text": "How important is it that the same customer can create income for you more than once?",
+      "options": [
+        {
+          "id": "A",
+          "text": "Very important. I would strongly prefer a model where customers can continue generating revenue."
+        },
+        {
+          "id": "B",
+          "text": "I would like repeat income, but it is not required."
+        },
+        {
+          "id": "C",
+          "text": "I am comfortable continually finding new buyers for one-off purchases."
+        },
+        {
+          "id": "D",
+          "text": "I care more about the total economics than whether the money comes from new or returning customers."
+        },
+        {
+          "id": "E",
+          "text": "I am not sure."
+        }
+      ]
+    },
+    {
+      "id": "q11",
+      "position": 11,
+      "text": "If a customer pays you again, which reason sounds most appealing?",
+      "options": [
+        {
+          "id": "A",
+          "text": "They used up a product and need more."
+        },
+        {
+          "id": "B",
+          "text": "They keep paying because they continue receiving access, content, tools, community, or support."
+        },
+        {
+          "id": "C",
+          "text": "They continue hiring me because I provide an ongoing service."
+        },
+        {
+          "id": "D",
+          "text": "They may buy again, but I do not need repeat purchases built into the model."
+        },
+        {
+          "id": "E",
+          "text": "I am not sure."
+        }
+      ]
+    },
+    {
+      "id": "q12",
+      "position": 12,
+      "text": "Which sounds better right now?",
+      "options": [
+        {
+          "id": "A",
+          "text": "Start with skills, knowledge, equipment, or experience I already have."
+        },
+        {
+          "id": "B",
+          "text": "Mostly use what I already know, but learn a few new things along the way."
+        },
+        {
+          "id": "C",
+          "text": "I am excited to learn a new business model or develop a new capability."
+        },
+        {
+          "id": "D",
+          "text": "I am willing to spend substantial time learning or developing something if I believe in it."
+        },
+        {
+          "id": "E",
+          "text": "I am not sure what I already know that someone would pay for."
+        }
+      ]
+    },
+    {
+      "id": "q13",
+      "position": 13,
+      "text": "Which role sounds most like something you would enjoy?",
+      "options": [
+        {
+          "id": "A",
+          "text": "Creating useful things people can buy."
+        },
+        {
+          "id": "B",
+          "text": "Finding good products or resources and connecting the right people with them."
+        },
+        {
+          "id": "C",
+          "text": "Personally helping someone solve a problem or get a result."
+        },
+        {
+          "id": "D",
+          "text": "Building the systems, brand, and operation behind a product."
+        },
+        {
+          "id": "E",
+          "text": "More than one of these sounds appealing."
+        }
+      ]
+    },
+    {
+      "id": "q14",
+      "position": 14,
+      "text": "What are you hoping this business can eventually do for you?",
+      "options": [
+        {
+          "id": "A",
+          "text": "Bring in some useful extra money."
+        },
+        {
+          "id": "B",
+          "text": "Become a meaningful second income."
+        },
+        {
+          "id": "C",
+          "text": "Potentially replace a job or primary income."
+        },
+        {
+          "id": "D",
+          "text": "Grow into something larger than what I can personally deliver by myself."
+        },
+        {
+          "id": "E",
+          "text": "I do not know yet. I mostly want to start."
+        }
+      ]
+    },
+    {
+      "id": "q15",
+      "position": 15,
+      "text": "If you could only optimize for ONE of these right now, which would you choose?",
+      "options": [
+        {
+          "id": "A",
+          "text": "Start with the least money and financial risk I reasonably can."
+        },
+        {
+          "id": "B",
+          "text": "Get to something sellable as quickly as I reasonably can."
+        },
+        {
+          "id": "C",
+          "text": "Build something I own and control."
+        },
+        {
+          "id": "D",
+          "text": "Build something that has the potential to become less dependent on my personal time."
+        },
+        {
+          "id": "E",
+          "text": "I honestly do not know yet."
+        }
+      ]
+    }
+  ],
+  "priorityTieBreaker": {
+    "id": "q16",
+    "position": 16,
+    "text": "You have said that several things matter to you. If they conflict, which one matters most right now?",
+    "help": "This final question is built from your own answers. It is a tie-breaker, not a new category.",
+    "maxOptions": 4
+  }
+}
