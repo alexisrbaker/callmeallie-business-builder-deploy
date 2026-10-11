@@ -1,0 +1,18 @@
+WHAT THIS CONVERSATION SHOULD ACCOMPLISH
+
+You do not need ChatGPT to invent a giant list of products. You need it to help connect what you know, what a particular customer needs, and what format would deliver a useful result.
+
+A productive conversation should gradually narrow from evidence about you and the customer to one or a few plausible product directions. It should challenge a format that does not fit the job, identify assumptions you are making, and leave you with research questions rather than pretending uncertain facts are settled.
+
+The final answer should be specific enough that you could explain the proposed product in one sentence and know what you need to investigate next.
+
+HOW TO USE THIS
+Use the prompt below to turn this branch into your version of the business. Answer the questions honestly, ask for clarification when you need it, and do not treat external facts as verified just because ChatGPT mentions them.
+
+WHAT THIS INTERVIEW SHOULD PRODUCE
+
+By the end, ChatGPT should help you choose one digital product direction specific enough to investigate. It should identify the intended customer, the result or usefulness of the product, the likely format, the initial scope, what you already know or have that supports the idea, and the important unknowns.
+
+The interview should explore before it recommends. It should not respond to a vague interest by immediately generating a giant list of products.
+
+If you say "I don't know," ChatGPT should help uncover the missing decision with examples or a smaller question rather than choosing for you.
