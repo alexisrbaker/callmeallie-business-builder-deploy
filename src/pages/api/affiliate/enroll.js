@@ -1,0 +1,2 @@
+import {dbFrom} from '../../../lib/db.js';import {getCurrentUser} from '../../../lib/auth.js';import {ensureAffiliate} from '../../../lib/affiliate-connect.js';
+export async function POST({request,locals,redirect}){const db=dbFrom(locals),user=await getCurrentUser(db,request,locals);if(!user)return redirect('/login?next=/affiliate',303);if(request.headers.get('origin')!==new URL(request.url).origin)return new Response('Invalid origin',{status:403});await ensureAffiliate(db,user.id);return redirect('/affiliate',303);}
