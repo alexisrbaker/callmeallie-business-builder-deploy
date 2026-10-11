@@ -1,0 +1,17 @@
+WHERE IDEAS OFTEN COME FROM
+
+Look for knowledge you have already organized for yourself. Think about processes you repeat, decisions you have learned to make, mistakes you can now help someone avoid, resources you have built because existing ones were frustrating, or subjects people already ask you about.
+
+You can also start from a customer problem you understand even if you have not built the solution yet. The next guide uses ChatGPT to help turn those clues into a specific digital product direction.
+
+A CONCRETE EXAMPLE
+
+Suppose you are good at planning inexpensive family road trips. "Make a digital product about travel" is still too broad.
+
+You might notice that parents repeatedly struggle to estimate driving days, meal stops, fuel, lodging, and activities without blowing the budget. Now there is a job for the product.
+
+A short ebook could explain your planning method. A spreadsheet could calculate and organize the budget. A template pack could provide packing lists, stop-planning sheets, and itinerary pages. A mini-course could demonstrate the process. A simple tool could automate parts of the calculation.
+
+Those are not five unrelated ideas. They are five possible ways to deliver a similar result.
+
+This is why choosing the customer problem first matters. Otherwise beginners often choose the format they have heard people sell online and then search for something to put inside it.
