@@ -1,0 +1,1 @@
+export async function hasEntitlement(db,userId,key){if(!db||!userId)return false;const r=await db.prepare(`SELECT id FROM entitlements WHERE user_id=? AND entitlement_key=? AND status='active' AND (starts_at IS NULL OR starts_at<=CURRENT_TIMESTAMP) AND (ends_at IS NULL OR ends_at>CURRENT_TIMESTAMP) LIMIT 1`).bind(userId,key).first();return Boolean(r)}
