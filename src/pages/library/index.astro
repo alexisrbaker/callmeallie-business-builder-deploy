@@ -1,0 +1,6 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { guides } from '../../data/guides.js';
+const groups=[['Start',1,2],['One-Off',3,19],['Consumable',20,30],['Subscription',31,38],['Service',39,45],['Finish',46,46]];
+---
+<BaseLayout title="Business Builder Library"><p class="muted">46-GUIDE DECISION LIBRARY</p><h1>Read what helps you make the next decision.</h1><p>You do not need to complete every guide. Follow the branch that matches what you are considering, then return to the router whenever the answer changes.</p>{groups.map(([name,a,b])=><section class="card"><h2>{name}</h2>{guides.filter(g=>g.number>=a&&g.number<=b).map(g=><p><a href={'/library/'+g.slug}><strong>{g.number}.</strong> {g.title}</a></p>)}</section>)}</BaseLayout>
