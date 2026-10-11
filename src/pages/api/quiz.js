@@ -1,0 +1,1 @@
+import{scoreQuiz}from'../../lib/quiz-engine.js';export const POST=async({request})=>{const f=await request.formData(),a={};for(let i=1;i<=16;i++)a['q'+i]=String(f.get('q'+i)||'');const result=scoreQuiz(a);const u=new URL('/results',request.url);u.searchParams.set('r',encodeURIComponent(JSON.stringify(result)));return Response.redirect(u,303)};
