@@ -1,0 +1,2 @@
+import { dbFrom } from '../../lib/db.js';
+export async function GET({locals}){const db=dbFrom(locals);let database=false;try{if(db){await db.prepare('SELECT 1').first();database=true;}}catch{}return new Response(JSON.stringify({ok:true,database}),{headers:{'content-type':'application/json'}});}
