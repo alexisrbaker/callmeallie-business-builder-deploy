@@ -1,0 +1,6 @@
+import{dbFrom}from'../../../lib/db.js';
+export const POST=async({request,locals})=>{const db=dbFrom(locals);if(!db)return new Response(JSON.stringify({valid:false}),{status:503,headers:{'content-type':'application/json'}});let body={};try{body=await request.json()}catch{return new Response(JSON.stringify({valid:false}),{status:400,headers:{'content-type':'application/json'}})}const id=String(body.installation_id||''),credential=String(body.credential||'');if(!id||!credential)return new Response(JSON.stringify({valid:false}),{status:400,headers:{'content-type':'application/json'}});
+const enc=new TextEncoder(),hash=Array.from(new Uint8Array(await crypto.subtle.digest('SHA-256',enc.encode(credential)))).map(b=>b.toString(16).padStart(2,'0')).join('');
+const row=await db.prepare(`SELECT i.id,l.status,l.current_period_end FROM installations i JOIN licenses l ON l.id=i.license_id WHERE i.id=? AND i.credential_hash=? AND i.status='active' LIMIT 1`).bind(id,hash).first();
+const valid=Boolean(row&&row.status==='active');if(valid)await db.prepare('UPDATE installations SET last_verified_at=CURRENT_TIMESTAMP WHERE id=?').bind(id).run();
+return new Response(JSON.stringify({valid,status:row?.status||'unknown',current_period_end:row?.current_period_end||null}),{status:valid?200:403,headers:{'content-type':'application/json'}})};
