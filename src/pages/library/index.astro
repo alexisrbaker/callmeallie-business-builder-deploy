@@ -1,6 +1,6 @@
 ---
 import '../../styles/site.css';
-import guides from '../../data/guides.json';
+import guides from '../../data/guides.js';
 const branches=['Start','One-Off','Consumable','Subscription','Service','Finish'];
 ---
 <main><a href="/">← Home</a><h1>Business Builder Library</h1><p>There are 46 guides here, but you are not expected to read all 46. Start with the quiz or Guide 1, then follow the decisions that apply to you.</p><div class="guide-links"><a class="button" href="/quiz">Find my starting point</a><a class="button secondary" href={`/library/${guides[0].slug}`}>Start with Guide 1</a></div>{branches.map(b=><section class="card"><h2>{b}</h2><div class="toc">{guides.filter(g=>g.branch===b).map(g=><a href={`/library/${g.slug}`}><span>{String(g.number).padStart(2,'0')}</span>{g.title}</a>)}</div></section>)}</main>
