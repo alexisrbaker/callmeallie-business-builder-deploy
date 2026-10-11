@@ -1,0 +1,14 @@
+name = "call-me-allie-business"
+main = "@astrojs/cloudflare/entrypoints/server"
+compatibility_date = "2026-10-10"
+
+[assets]
+directory = "./dist"
+binding = "STATIC_ASSETS"
+
+[[d1_databases]]
+binding = "DB"
+migrations_dir = "migrations"
+
+[[r2_buckets]]
+binding = "ASSETS"
