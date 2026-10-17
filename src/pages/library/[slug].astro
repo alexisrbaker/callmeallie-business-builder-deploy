@@ -1,17 +1,30 @@
 ---
 import '../../styles/site.css';
 import guides from '../../data/guides.json';
-import {dbFrom} from '../../lib/db.js';
-import {getCurrentUser} from '../../lib/auth.js';
-import {hasEntitlement} from '../../lib/entitlements.js';
 const guide=guides.find(g=>g.slug===Astro.params.slug);
 if(!guide) return Astro.redirect('/library');
 const branches=['Start','One-Off','Consumable','Subscription','Service','Finish'];
-const db=dbFrom(Astro.locals);
-let unlocked=false;
-try{const user=db?await getCurrentUser(db,Astro.request,Astro.locals):null;if(user)unlocked=await hasEntitlement(db,user.id,'business_builder_library')}catch(e){console.error('Library entitlement lookup',e)}
-const lines=guide.content.split(/\n+/).map(x=>x.trim()).filter(Boolean);
-const isHeading=(x)=>x.length<90 && x===x.toUpperCase() && /[A-Z]/.test(x);
 ---
-<head><meta charset="utf-8" /><link rel="icon" type="image/svg+xml" href="/favicon.svg" /></head>
-<header class="site-header"><a class="brand" href="/">Call Me Allie <em>Business</em></a><nav aria-label="Main navigation"><a href="/quiz">Business Direction Quiz</a><a href="/library">Library</a><a href="/account">Account</a></nav></header><main class="library-layout"><aside class="tree card"><h2>Library</h2>{branches.map(b=><details open={b===guide.branch}><summary>{b}</summary>{guides.filter(g=>g.branch===b).map(g=><a class:list={['tree-link',{active:g.number===guide.number}]} href={`/library/${g.slug}`}>{g.number}. {g.title}</a>)}</details>)}</aside><article class="guide"><p class="eyebrow">{guide.branch} · Guide {guide.number}</p><h1>{guide.title}</h1>{unlocked ? <div class="guide-actions"><button type="button" disabled title="PDF export is not yet available">Download PDF</button><button type="button" disabled>Bookmark</button></div> : <section class="guide-locked card"><div class="lock-emblem" aria-hidden="true">🔒</div><h2>Unlock the Business Builder Library</h2><p>Explore all 46 guided business lessons with one purchase.</p><a class="button primary-cta" href="/buy">Unlock All 46 Guides — $46</a><p class="muted">Already purchased? <a href="/login?next=%2Flibrary">Sign in to access your guides</a>.</p><p>Interested in selling the package? <a href="/mrr">Explore Master Resell Rights</a>.</p></section>}{unlocked&&lines.map(line=>isHeading(line)?<h2>{line}</h2>:<p>{line}</p>)}{unlocked&&guide.choices?.length>0&&<section class="card"><h2>Where do you want to go next?</h2><div class="guide-links">{guide.choices.map(c=><a class="button secondary" href={`/library/${c.to}`}>{c.text} →</a>)}</div></section>}</article></main>
+<head><meta charset="utf-8"/><link rel="icon" type="image/svg+xml" href="/favicon.svg"/></head>
+<header class="site-header"><a class="brand" href="/">Call Me Allie <em>Business</em></a><nav aria-label="Main navigation"><a href="/quiz">Business Direction Quiz</a><a href="/library">Library</a><a href="/account">Account</a></nav></header>
+<main class="library-layout">
+ <aside class="tree card"><h2>Library</h2>{branches.map(b=><details open={b===guide.branch}><summary>{b}</summary>{guides.filter(g=>g.branch===b).map(g=><a class:list={['tree-link',{active:g.number===guide.number}]} href={'/library/'+g.slug}>{g.number}. {g.title}</a>)}</details>)}</aside>
+ <article class="guide"><p class="eyebrow">{guide.branch} · Guide {guide.number} of 46</p><h1>{guide.title}</h1>
+ <div id="guide-loading" class="muted">Checking access…</div>
+ <section id="guide-lock" class="guide-locked card" hidden><div class="lock-emblem" aria-hidden="true">🔒</div><h2>Unlock your Business Builder training</h2><p>This guide is part of the 46-guide Business Builder Library.</p><a class="button primary-cta" href="/buy">Unlock All 46 Guides — $46</a><p class="muted">Already purchased? <a href={'/login?next='+encodeURIComponent('/library/'+guide.slug)}>Sign in to unlock your guides.</a></p></section>
+ <div id="guide-content" hidden></div>
+ <div id="guide-choices" class="card" hidden><h2>Where do you want to go next?</h2></div>
+ </article>
+</main>
+<script define:vars={{slug:guide.slug}}>
+const loading=document.getElementById('guide-loading'),locked=document.getElementById('guide-lock'),content=document.getElementById('guide-content'),choices=document.getElementById('guide-choices');
+function addText(container,text,tag='p'){const el=document.createElement(tag);el.textContent=text;container.appendChild(el)}
+function showLock(){loading.hidden=true;locked.hidden=false}
+fetch('/api/library/'+encodeURIComponent(slug),{credentials:'same-origin',cache:'no-store'}).then(r=>{if(!r.ok)throw Error('Unavailable');return r.json()}).then(data=>{
+ if(!data.unlocked){showLock();return}
+ loading.hidden=true;content.hidden=false;
+ const lines=String(data.content||'').split(/\n+/).map(x=>x.trim()).filter(Boolean);
+ for(const line of lines)addText(content,line,line.length<90&&line===line.toUpperCase()&&/[A-Z]/.test(line)?'h2':'p');
+ if(Array.isArray(data.choices)&&data.choices.length){choices.hidden=false;for(const c of data.choices){const a=document.createElement('a');a.className='button secondary';a.href='/library/'+encodeURIComponent(c.to);a.textContent=c.text+' →';choices.appendChild(a)}}
+}).catch(()=>showLock());
+</script>
