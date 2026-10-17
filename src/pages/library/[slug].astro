@@ -1,11 +1,17 @@
 ---
 import '../../styles/site.css';
 import guides from '../../data/guides.json';
+import {dbFrom} from '../../lib/db.js';
+import {getCurrentUser} from '../../lib/auth.js';
+import {hasEntitlement} from '../../lib/entitlements.js';
 const guide=guides.find(g=>g.slug===Astro.params.slug);
 if(!guide) return Astro.redirect('/library');
 const branches=['Start','One-Off','Consumable','Subscription','Service','Finish'];
+const db=dbFrom(Astro.locals);
+let unlocked=false;
+try{const user=db?await getCurrentUser(db,Astro.request,Astro.locals):null;if(user)unlocked=await hasEntitlement(db,user.id,'business_builder_library')}catch(e){console.error('Library entitlement lookup',e)}
 const lines=guide.content.split(/\n+/).map(x=>x.trim()).filter(Boolean);
 const isHeading=(x)=>x.length<90 && x===x.toUpperCase() && /[A-Z]/.test(x);
 ---
 <head><meta charset="utf-8" /><link rel="icon" type="image/svg+xml" href="/favicon.svg" /></head>
-<header class="site-header"><a class="brand" href="/">Call Me Allie <em>Business</em></a><nav aria-label="Main navigation"><a href="/quiz">Business Direction Quiz</a><a href="/library">Library</a><a href="/account">Account</a></nav></header><main class="library-layout"><aside class="tree card"><h2>Library</h2>{branches.map(b=><details open={b===guide.branch}><summary>{b}</summary>{guides.filter(g=>g.branch===b).map(g=><a class:list={['tree-link',{active:g.number===guide.number}]} href={`/library/${g.slug}`}>{g.number}. {g.title}</a>)}</details>)}</aside><article class="guide"><p class="eyebrow">{guide.branch} · Guide {guide.number}</p><h1>{guide.title}</h1><div class="guide-actions"><button type="button" disabled title="PDF generation is wired in a later build">Download PDF</button><button type="button" disabled>Bookmark</button></div>{lines.map(line=>isHeading(line)?<h2>{line}</h2>:<p>{line}</p>)}{guide.choices?.length>0&&<section class="card"><h2>Where do you want to go next?</h2><div class="guide-links">{guide.choices.map(c=><a class="button secondary" href={`/library/${c.to}`}>{c.text} →</a>)}</div></section>}</article></main>
+<header class="site-header"><a class="brand" href="/">Call Me Allie <em>Business</em></a><nav aria-label="Main navigation"><a href="/quiz">Business Direction Quiz</a><a href="/library">Library</a><a href="/account">Account</a></nav></header><main class="library-layout"><aside class="tree card"><h2>Library</h2>{branches.map(b=><details open={b===guide.branch}><summary>{b}</summary>{guides.filter(g=>g.branch===b).map(g=><a class:list={['tree-link',{active:g.number===guide.number}]} href={`/library/${g.slug}`}>{g.number}. {g.title}</a>)}</details>)}</aside><article class="guide"><p class="eyebrow">{guide.branch} · Guide {guide.number}</p><h1>{guide.title}</h1>{unlocked ? <div class="guide-actions"><button type="button" disabled title="PDF export is not yet available">Download PDF</button><button type="button" disabled>Bookmark</button></div> : <section class="guide-locked card"><div class="lock-emblem" aria-hidden="true">🔒</div><h2>Unlock the Business Builder Library</h2><p>Explore all 46 guided business lessons with one purchase.</p><a class="button primary-cta" href="/buy">Unlock All 46 Guides — $46</a><p class="muted">Already purchased? <a href="/login?next=%2Flibrary">Sign in to access your guides</a>.</p><p>Interested in selling the package? <a href="/mrr">Explore Master Resell Rights</a>.</p></section>}{unlocked&&lines.map(line=>isHeading(line)?<h2>{line}</h2>:<p>{line}</p>)}{unlocked&&guide.choices?.length>0&&<section class="card"><h2>Where do you want to go next?</h2><div class="guide-links">{guide.choices.map(c=><a class="button secondary" href={`/library/${c.to}`}>{c.text} →</a>)}</div></section>}</article></main>
