@@ -5,7 +5,7 @@ main = "./dist/server/entry.mjs"
 compatibility_date = "2026-10-10"
 
 [assets]
-directory = "./dist"
+directory = "./dist/client"
 binding = "STATIC_ASSETS"
 
 [[d1_databases]]
