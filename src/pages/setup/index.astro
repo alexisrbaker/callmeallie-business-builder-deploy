@@ -1,4 +1,23 @@
 ---
-import '../../styles/site.css';import{dbFrom,isConfigured,identityDbFrom}from'../../lib/db.js';const db=dbFrom(Astro.locals);const shared=Boolean(identityDbFrom(Astro.locals));const configured=db?await isConfigured(db):false;if(configured)return Astro.redirect('/admin/settings');
+import '../../styles/site.css';
+import { setupReadiness } from '../../lib/setup-readiness.js';
+import { dbFrom,isConfigured } from '../../lib/db.js';
+const check=await setupReadiness(Astro.locals);
+let configured=false;
+if(check.ready){try{configured=await isConfigured(dbFrom(Astro.locals))}catch(e){console.error('read setup',e)}}
+if(configured)return Astro.redirect('/admin/settings');
 ---
-<main><h1>Set up your website</h1><p>This is the graphical handoff from deployment to site ownership. Normal setup does not require SQL, Wrangler, environment files, or source-code editing.</p>{!db?<section class="card"><h2>Deployment is not finished yet</h2><p>The application is running, but its database binding is not available. The eventual one-click deployment process will provision this automatically before sending the owner here.</p></section>:<form class="card" method="post" action="/api/setup/save"><h2>1. {shared ? 'Connect the owner and business' : 'Create the owner and business'}</h2>{!shared && <label>Your name<input name="name" autocomplete="name"></label>}<label>{shared ? 'Existing CallMeAllie owner/admin email' : 'Owner email'}<input name="email" type="email" required></label><label>{shared ? 'Existing CallMeAllie password' : 'Owner password'}<input name="password" type="password" minlength="10" required></label><label>Business name<input name="business_name" required></label><button>Save and continue</button></form>}<section class="card"><h2>What comes next in this wizard</h2><p>Branding → Stripe → email → products → licensing where applicable → system check → launch.</p></section></main>
+<head><meta charset="utf-8"/><link rel="icon" type="image/svg+xml" href="/favicon.svg"/></head>
+<header class="site-header"><a class="brand" href="/">Call Me Allie <em>Business</em></a><nav aria-label="Main navigation"><a href="/quiz">Business Direction Quiz</a><a href="/library">Library</a><a href="/account">Account</a></nav></header>
+<main class="account-page"><p class="eyebrow">FIRST-TIME SETUP</p><h1>Set up your website</h1>
+{!check.ready?<section class="card" role="alert"><h2>Database setup needs to finish</h2><p>{check.message}</p><p>Missing: {check.missing.join(', ')}.</p><p>The installer must apply the bundled D1 migrations to this website's own database before an owner can sign in. Do not use the Publishing database for customer installations.</p></section>:
+<form class="card" method="post" action="/api/setup/save">
+<h2>{check.shared?'Connect your existing Publishing admin':'Create your website owner account'}</h2>
+<p>{check.shared?'This installation uses the existing CallMeAllie Publishing identity database. Sign in with its existing owner or admin credentials.':'This installation has its own account database, separate from CallMeAllie Publishing. Create the first owner here; future customers will not need assistance from Call Me Allie to claim their own site.'}</p>
+{!check.shared&&<label>Your name<input name="name" autocomplete="name" required/></label>}
+<label>{check.shared?'Publishing admin email':'Owner email'}<input name="email" type="email" autocomplete="email" required/></label>
+<label>Password<input name="password" type="password" autocomplete={check.shared?'current-password':'new-password'} minlength="10" required/></label>
+<label>Business name<input name="business_name" required/></label>
+<button type="submit">{check.shared?'Connect Admin Account':'Create Owner Account'}</button>
+</form>}
+</main>
