@@ -3,4 +3,22 @@ import '../styles/site.css';
 const next=Astro.url.searchParams.get('next')||'/account';
 ---
 <head><meta charset="utf-8" /><link rel="icon" type="image/svg+xml" href="/favicon.svg" /></head><header class="site-header"><a class="brand" href="/">Call Me Allie <em>Business</em></a><nav aria-label="Main navigation"><a href="/quiz">Business Direction Quiz</a><a href="/library">Library</a><a href="/account">Account</a></nav></header>
-<main><a href="/">← Home</a><h1>Sign in</h1><form class="card" method="post" action="/api/auth/login"><input type="hidden" name="next" value={next}><label>Email<input name="email" type="email" required></label><label>Password<input name="password" type="password" required></label><button>Sign in</button></form><p>Need an account? <a href="/register">Create one</a>.</p></main>
+<main><a href="/">← Home</a><h1>Sign in</h1><form class="card" id="login-form" method="post" action="/api/auth/login"><p id="login-error" class="warn" role="alert" hidden></p><input type="hidden" name="next" value={next}><label>Email<input name="email" type="email" required></label><label>Password<input name="password" type="password" required></label><button>Sign in</button></form><p>Need an account? <a href="/register">Create one</a>.</p></main>
+<script>
+const form=document.getElementById('login-form');
+form?.addEventListener('submit',async e=>{
+ e.preventDefault();
+ const error=document.getElementById('login-error');error.hidden=true;
+ const button=form.querySelector('button[type="submit"],button:not([type])');
+ button.disabled=true;button.textContent='Signing in…';
+ try{
+  const response=await fetch(form.action,{method:'POST',body:new FormData(form),credentials:'same-origin',redirect:'follow'});
+  if(response.ok&&response.redirected){location.assign(response.url);return}
+  if(response.ok&&new URL(response.url).pathname==='/account'){location.assign(response.url);return}
+  const message=await response.text();
+  error.textContent=(message&&message.length<500&&!message.includes('<!DOCTYPE'))?message:'Sign-in is unavailable (HTTP '+response.status+'). Please try again after database setup is confirmed.';
+  error.hidden=false;
+ }catch(e){error.textContent='Unable to complete sign-in. Please try again.';error.hidden=false}
+ finally{button.disabled=false;button.textContent='Sign in'}
+});
+</script>
