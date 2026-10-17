@@ -1,1 +1,0 @@
-export async function POST(){return new Response(JSON.stringify({active:false,error:'License verification not configured'}),{status:503,headers:{'content-type':'application/json','cache-control':'no-store'}});}
