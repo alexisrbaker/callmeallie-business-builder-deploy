@@ -1,11 +1,11 @@
 name = "call-me-allie-business"
-main = "@astrojs/cloudflare/entrypoints/server"
+main = "./dist/server/entry.mjs"
 compatibility_date = "2026-10-10"
 
 # Customer deployment: Wrangler / Workers Builds provisions these resources.
 # Do not supply resource IDs in this distributable template.
 [assets]
-directory = "./dist"
+directory = "./dist/client"
 binding = "STATIC_ASSETS"
 
 [[d1_databases]]
