@@ -35,3 +35,5 @@ label{display:block;margin:.75rem 0;font-weight:600}input,select,textarea{box-si
 .hero-copy h1{font-size:clamp(2.45rem,3.25vw,3.55rem);line-height:1.12;max-width:650px;letter-spacing:-.025em}
 .hero-description{font-size:1.05rem;line-height:1.65;max-width:610px}
 @media(max-width:850px){.hero-copy h1{font-size:clamp(2.25rem,7vw,3rem)}}
+
+.guide-locked{text-align:center;display:flex;flex-direction:column;align-items:center;gap:10px;padding:48px 26px;border:1px solid #dfd7cd;background:linear-gradient(145deg,#fffdf9,#f2eae2);border-radius:22px}.guide-locked .lock-emblem{display:grid;place-items:center;width:64px;height:64px;border-radius:50%;background:#e7d8cd;font-size:27px}.guide-locked h2{margin:8px 0;color:#284735;font-family:Georgia,serif;font-size:clamp(1.5rem,3vw,2.1rem)}.guide-locked p{max-width:550px;margin:5px auto;line-height:1.5}.guide-locked .primary-cta{margin:14px 0}.library-offer{padding:27px 30px;border-color:#ced8cb;background:#f7fbf5}.library-offer h2{color:#284735;margin-top:0}
