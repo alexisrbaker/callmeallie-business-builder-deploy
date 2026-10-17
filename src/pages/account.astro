@@ -1,11 +1,48 @@
 ---
-import '../styles/site.css';import{dbFrom}from'../lib/db.js';import{getCurrentUser}from'../lib/auth.js';
-const db=dbFrom(Astro.locals),user=await getCurrentUser(db,Astro.request,Astro.locals);if(!user)return Astro.redirect('/login');let ents=[],attempts=[],licenses=[];if(db){ents=(await db.prepare(`SELECT entitlement_key,status,ends_at FROM entitlements WHERE user_id=? ORDER BY created_at DESC`).bind(user.id).all()).results||[];attempts=(await db.prepare(`SELECT qa.id,qa.completed_at,qa.is_current,qr.business_shape,qr.implementation_direction,qr.confidence FROM quiz_attempts qa LEFT JOIN quiz_results qr ON qr.attempt_id=qa.id WHERE qa.user_id=? ORDER BY qa.completed_at DESC LIMIT 20`).bind(user.id).all()).results||[];licenses=(await db.prepare(`SELECT l.status,l.billing_status,l.current_period_end,lt.name FROM licenses l JOIN license_types lt ON lt.id=l.license_type_id WHERE l.owner_user_id=? ORDER BY l.created_at DESC`).bind(user.id).all()).results||[]}
+import '../styles/site.css';
+import { dbFrom } from '../lib/db.js';
+import { getCurrentUser } from '../lib/auth.js';
+const db = dbFrom(Astro.locals);
+let user=null, ents=[], attempts=[], licenses=[], accountError='';
+try { if(db) user=await getCurrentUser(db,Astro.request,Astro.locals); }
+catch(e){ console.error('account authentication',e); accountError='Your account is temporarily unavailable. Please try again shortly.'; }
+if(user&&db){
+ try {
+  ents=(await db.prepare('SELECT entitlement_key,status,ends_at FROM entitlements WHERE user_id=? ORDER BY created_at DESC').bind(user.id).all()).results||[];
+  attempts=(await db.prepare('SELECT qa.id,qa.completed_at,qa.is_current,qr.business_shape,qr.implementation_direction,qr.confidence FROM quiz_attempts qa LEFT JOIN quiz_results qr ON qr.attempt_id=qa.id WHERE qa.user_id=? ORDER BY qa.completed_at DESC LIMIT 20').bind(user.id).all()).results||[];
+  licenses=(await db.prepare('SELECT l.status,l.billing_status,l.current_period_end,lt.name FROM licenses l JOIN license_types lt ON lt.id=l.license_type_id WHERE l.owner_user_id=? ORDER BY l.created_at DESC').bind(user.id).all()).results||[];
+ } catch(e){ console.error('account data',e); accountError='Your account is connected, but its saved information is temporarily unavailable. Database setup may still be required.'; }
+}
 ---
-<head><meta charset="utf-8" /><link rel="icon" type="image/svg+xml" href="/favicon.svg" /></head><header class="site-header"><a class="brand" href="/">Call Me Allie <em>Business</em></a><nav aria-label="Main navigation"><a href="/quiz">Business Direction Quiz</a><a href="/library">Library</a><a href="/account">Account</a></nav></header>
-<main><div id="pending-save" class="card" hidden><h2>Save your quiz results</h2><p id="pending-save-status">Saving your recent quiz result to this account…</p><button type="button" id="retry-save" hidden>Try saving again</button></div><a href="/">← Home</a><h1>{user.display_name||user.email}</h1><section class="card"><h2>Your access</h2>{ents.length? <ul>{ents.map(e=><li><strong>{e.entitlement_key}</strong> · {e.status}{e.ends_at?` through ${e.ends_at}`:''}</li>)}</ul>:<p>No paid capabilities yet. Your free account can still save quiz history.</p>}</section><section class="card"><h2>Commercial licenses</h2>{licenses.length?<ul>{licenses.map(l=><li><strong>{l.name}</strong> · {l.status}{l.billing_status?` · ${l.billing_status}`:''}{l.current_period_end?` · paid through ${l.current_period_end}`:''}</li>)}</ul>:<p>No commercial licenses yet.</p>}</section><section class="card"><h2>Quiz history</h2>{attempts.length?<div class="toc">{attempts.map(a=><div><strong>{a.business_shape||'Result'}</strong> · {a.confidence||''} {a.is_current?'· Current':''}<br/><span class="muted">{a.completed_at}</span></div>)}</div>:<p>No saved quiz attempts yet.</p>}<a class="button secondary" href="/quiz">Take the quiz</a></section><form method="post" action="/api/auth/logout"><button class="secondary">Sign out</button></form></main>
+<head><meta charset="utf-8"/><link rel="icon" type="image/svg+xml" href="/favicon.svg"/></head>
+<header class="site-header"><a class="brand" href="/">Call Me Allie <em>Business</em></a><nav aria-label="Main navigation"><a href="/quiz">Business Direction Quiz</a><a href="/library">Library</a><a href="/account">Account</a></nav></header>
+<main class="account-page">
+{!user ? <section class="account-welcome"><p class="eyebrow">YOUR BUSINESS DIRECTION</p><h1>Your business journey, saved in one place.</h1><p>Taking the Business Direction Quiz and viewing your results is free. Create an account only if you want to save your recommendations, return to them later, or access training you've purchased.</p><div class="guide-links"><a href="/register?next=%2Faccount%3Fsave_quiz%3D1" class="button primary-cta">Create a Free Account</a><a href="/login?next=%2Faccount%3Fsave_quiz%3D1" class="button secondary">Sign In</a></div><p class="muted">No account needed to take the quiz or see your results.</p><a href="/quiz">Take the free quiz →</a>{accountError&&<p class="warn">{accountError}</p>}</section> :
+ <>
+ <h1>Welcome back, {user.display_name||user.email}.</h1>
+ {accountError&&<section class="card warn" role="alert">{accountError}</section>}
+ <div id="pending-save" class="card" hidden><h2>Saving your quiz results</h2><p id="pending-save-status">Preparing to save…</p><button type="button" id="retry-save" hidden>Try again</button></div>
+ <section class="card"><h2>Your saved directions</h2>{attempts.length?<div class="toc">{attempts.map(a=><div><strong>{a.business_shape||'Your result'}</strong>{a.implementation_direction&&<p>{a.implementation_direction}</p>}<span class="muted">{a.completed_at}{a.is_current?' · Current result':''}</span></div>)}</div>:<p>You haven't saved any quiz results yet.</p>}<a class="button secondary" href="/quiz">Take or Retake the Quiz</a></section>
+ <section class="card"><h2>Your Business Builder access</h2>{ents.length?<ul>{ents.map(e=><li>{e.entitlement_key} · {e.status}</li>)}</ul>:<p>Your free account is ready. The 46-guide Business Builder Library is a separate one-time purchase.</p>}<a class="button secondary" href="/library">Browse the Library</a></section>
+ {licenses.length>0&&<section class="card"><h2>Your licenses</h2><ul>{licenses.map(l=><li>{l.name} · {l.status}</li>)}</ul></section>}
+ <form action="/api/auth/logout" method="post"><button class="button secondary" type="submit">Sign Out</button></form>
+ </>}
+</main>
 <script>
-const pending=sessionStorage.getItem('allie_pending_quiz_result');const panel=document.getElementById('pending-save');const status=document.getElementById('pending-save-status');const retry=document.getElementById('retry-save');
-async function savePending(){if(!pending)return;panel.hidden=false;retry.hidden=true;status.textContent='Saving your quiz result…';try{const r=await fetch('/api/quiz/save',{method:'POST',headers:{'Content-Type':'application/json'},body:pending});if(!r.ok)throw new Error('Save failed');sessionStorage.removeItem('allie_pending_quiz_result');status.textContent='Your quiz results have been saved. Refresh this page to see them in your history.';}catch(e){status.textContent='We could not save the result yet. Your result is still retained in this browser tab.';retry.hidden=false}}
-retry?.addEventListener('click',savePending);if(pending)savePending();
+const pending=sessionStorage.getItem('allie_pending_quiz_result');
+const panel=document.getElementById('pending-save');
+const status=document.getElementById('pending-save-status');
+const retry=document.getElementById('retry-save');
+async function savePending(){
+ if(!pending||!panel)return;
+ panel.hidden=false;retry.hidden=true;status.textContent='Saving your quiz result…';
+ try{
+  const response=await fetch('/api/quiz/save',{method:'POST',headers:{'Content-Type':'application/json'},body:pending});
+  if(!response.ok)throw new Error('Could not save');
+  sessionStorage.removeItem('allie_pending_quiz_result');
+  status.textContent='Saved to your account. Refresh to see it in your history.';
+ }catch(e){status.textContent='Could not save the result yet. It is still available in this browser tab.';retry.hidden=false;}
+}
+retry?.addEventListener('click',savePending);
+if(pending)savePending();
 </script>
