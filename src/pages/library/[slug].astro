@@ -1,6 +1,6 @@
 ---
 import '../../styles/site.css';
-import guides from '../../data/guides.js';
+import guides from '../../data/guides.json';
 const guide=guides.find(g=>g.slug===Astro.params.slug);
 if(!guide) return Astro.redirect('/library');
 const branches=['Start','One-Off','Consumable','Subscription','Service','Finish'];
