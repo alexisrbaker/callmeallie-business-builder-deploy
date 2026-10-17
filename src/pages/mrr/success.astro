@@ -1,4 +1,7 @@
 ---
-import '../../styles/site.css';
+import { dbFrom } from '../../lib/db.js';
+import { getCurrentUser } from '../../lib/auth.js';
+import { hasPaidMrrPackage } from '../../lib/mrr.js';
+const db=dbFrom(Astro.locals);const user=await getCurrentUser(db,Astro.request,Astro.locals);const owns=user?await hasPaidMrrPackage(db,user.id):false;
 ---
-<main><h1>MRR purchase</h1><p>Your purchase is confirmed by the signed payment event. Personal Business Builder access and commercial resale licensing are separate.</p><section class="card"><h2>Next: commercial licensing</h2><p>Complete license activation before making new MRR sales.</p><a class="button" href="/mrr/activate">Activate my commercial license →</a></section><p><a href="/account">Check my account</a></p></main>
+<html><head><title>MRR purchase</title><link rel="stylesheet" href="/styles/site.css" /></head><body><main><h1>{owns?'Your MRR package is ready':'Payment received'}</h1>{owns?<><p>Your package purchase is recorded, and your personal Business Builder Library access is included.</p><section class="card"><h2>Next: activate commercial rights</h2><p>The $460 purchase and the active commercial license are separate. Complete license activation before making new MRR sales.</p><a class="button" href="/mrr/activate">Activate my commercial license →</a></section><p><a href="/library">Open my Business Builder Library</a></p></>:<><p>Stripe may still be delivering the signed payment confirmation. Refresh this page shortly. Access is granted by the webhook, not by trusting this browser redirect.</p><p><a href="/account">Check my account</a></p></>}</main></body></html>
