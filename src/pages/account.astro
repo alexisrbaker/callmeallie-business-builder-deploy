@@ -1,48 +1,72 @@
 ---
 import '../styles/site.css';
-import { dbFrom } from '../lib/db.js';
-import { getCurrentUser } from '../lib/auth.js';
-const db = dbFrom(Astro.locals);
-let user=null, ents=[], attempts=[], licenses=[], accountError='';
-try { if(db) user=await getCurrentUser(db,Astro.request,Astro.locals); }
-catch(e){ console.error('account authentication',e); accountError='Your account is temporarily unavailable. Please try again shortly.'; }
-if(user&&db){
- try {
-  ents=(await db.prepare('SELECT entitlement_key,status,ends_at FROM entitlements WHERE user_id=? ORDER BY created_at DESC').bind(user.id).all()).results||[];
-  attempts=(await db.prepare('SELECT qa.id,qa.completed_at,qa.is_current,qr.business_shape,qr.implementation_direction,qr.confidence FROM quiz_attempts qa LEFT JOIN quiz_results qr ON qr.attempt_id=qa.id WHERE qa.user_id=? ORDER BY qa.completed_at DESC LIMIT 20').bind(user.id).all()).results||[];
-  licenses=(await db.prepare('SELECT l.status,l.billing_status,l.current_period_end,lt.name FROM licenses l JOIN license_types lt ON lt.id=l.license_type_id WHERE l.owner_user_id=? ORDER BY l.created_at DESC').bind(user.id).all()).results||[];
- } catch(e){ console.error('account data',e); accountError='Your account is connected, but its saved information is temporarily unavailable. Database setup may still be required.'; }
-}
 ---
 <head><meta charset="utf-8"/><link rel="icon" type="image/svg+xml" href="/favicon.svg"/></head>
 <header class="site-header"><a class="brand" href="/">Call Me Allie <em>Business</em></a><nav aria-label="Main navigation"><a href="/quiz">Business Direction Quiz</a><a href="/library">Library</a><a href="/account">Account</a></nav></header>
 <main class="account-page">
-{!user ? <section class="account-welcome"><p class="eyebrow">YOUR BUSINESS DIRECTION</p><h1>Your business journey, saved in one place.</h1><p>Taking the Business Direction Quiz and viewing your results is free. Create an account only if you want to save your recommendations, return to them later, or access training you've purchased.</p><div class="guide-links"><a href="/register?next=%2Faccount%3Fsave_quiz%3D1" class="button primary-cta">Create a Free Account</a><a href="/login?next=%2Faccount%3Fsave_quiz%3D1" class="button secondary">Sign In</a></div><p class="muted">No account needed to take the quiz or see your results.</p><a href="/quiz">Take the free quiz →</a>{accountError&&<p class="warn">{accountError}</p>}</section> :
- <>
- <h1>Welcome back, {user.display_name||user.email}.</h1>
- {accountError&&<section class="card warn" role="alert">{accountError}</section>}
- <div id="pending-save" class="card" hidden><h2>Saving your quiz results</h2><p id="pending-save-status">Preparing to save…</p><button type="button" id="retry-save" hidden>Try again</button></div>
- <section class="card"><h2>Your saved directions</h2>{attempts.length?<div class="toc">{attempts.map(a=><div><strong>{a.business_shape||'Your result'}</strong>{a.implementation_direction&&<p>{a.implementation_direction}</p>}<span class="muted">{a.completed_at}{a.is_current?' · Current result':''}</span></div>)}</div>:<p>You haven't saved any quiz results yet.</p>}<a class="button secondary" href="/quiz">Take or Retake the Quiz</a></section>
- <section class="card"><h2>Your Business Builder access</h2>{ents.length?<ul>{ents.map(e=><li>{e.entitlement_key} · {e.status}</li>)}</ul>:<p>Your free account is ready. The 46-guide Business Builder Library is a separate one-time purchase.</p>}<a class="button secondary" href="/library">Browse the Library</a></section>
- {licenses.length>0&&<section class="card"><h2>Your licenses</h2><ul>{licenses.map(l=><li>{l.name} · {l.status}</li>)}</ul></section>}
- <form action="/api/auth/logout" method="post"><button class="button secondary" type="submit">Sign Out</button></form>
- </>}
+ <section id="account-loading" class="card" role="status"><h1>Your account</h1><p>Checking your account…</p></section>
+ <section id="account-guest" class="account-welcome" hidden>
+  <p class="eyebrow">YOUR BUSINESS DIRECTION</p>
+  <h1>Your business journey, saved in one place.</h1>
+  <p>Your quiz and recommendations are free. Create a free account to save your results for later and access training you've purchased.</p>
+  <div class="guide-links"><a class="button primary-cta" href="/register?next=%2Faccount">Create a Free Account</a><a class="button secondary" href="/login?next=%2Faccount">Sign In</a></div>
+  <p class="muted">You don't need an account to take the quiz or see your results.</p><a href="/quiz">Take the free quiz →</a>
+ </section>
+ <section id="account-member" hidden>
+  <h1 id="account-greeting">Your account</h1>
+  <div id="account-warnings" aria-live="polite"></div>
+  <div id="pending-save" class="card" hidden><h2>Save your quiz results</h2><p id="pending-save-status"></p><button type="button" id="retry-save" hidden>Try again</button></div>
+  <section class="card"><h2>Your saved business directions</h2><div id="saved-directions"><p>No saved results yet.</p></div><a class="button secondary" href="/quiz">Take or Retake the Quiz</a></section>
+  <section class="card"><h2>Business Builder Library</h2><div id="library-access"><p>The 46-guide Business Builder Library is a separate one-time purchase.</p></div><a class="button secondary" href="/library">Browse the Library</a></section>
+  <section class="card" id="account-license-card" hidden><h2>Commercial licenses</h2><div id="account-licenses"></div></section>
+  <form method="post" action="/api/auth/logout"><button type="submit" class="button secondary">Sign Out</button></form>
+ </section>
 </main>
 <script>
-const pending=sessionStorage.getItem('allie_pending_quiz_result');
-const panel=document.getElementById('pending-save');
-const status=document.getElementById('pending-save-status');
-const retry=document.getElementById('retry-save');
-async function savePending(){
- if(!pending||!panel)return;
- panel.hidden=false;retry.hidden=true;status.textContent='Saving your quiz result…';
- try{
-  const response=await fetch('/api/quiz/save',{method:'POST',headers:{'Content-Type':'application/json'},body:pending});
-  if(!response.ok)throw new Error('Could not save');
-  sessionStorage.removeItem('allie_pending_quiz_result');
-  status.textContent='Saved to your account. Refresh to see it in your history.';
- }catch(e){status.textContent='Could not save the result yet. It is still available in this browser tab.';retry.hidden=false;}
+const el=id=>document.getElementById(id);
+function show(id){el('account-loading').hidden=true;el(id).hidden=false}
+function para(target,text){const p=document.createElement('p');p.textContent=text;target.appendChild(p)}
+function renderAccount(data){
+ show('account-member');
+ el('account-greeting').textContent='Welcome back, '+data.name+'.';
+ for(const warning of data.warnings||[])para(el('account-warnings'),warning);
+ if(data.isOwner){const a=document.createElement('a');a.href='/admin/settings';a.textContent='Manage site settings →';el('account-warnings').appendChild(a)}
+ if(data.attempts?.length){
+  const list=el('saved-directions');list.replaceChildren();
+  for(const item of data.attempts){
+   const block=document.createElement('div');block.className='card';
+   const title=document.createElement('strong');title.textContent=item.business_shape||'Business direction';block.appendChild(title);
+   if(item.implementation_direction)para(block,item.implementation_direction);
+   const small=document.createElement('small');small.textContent=(item.completed_at||'')+(item.is_current?' · Current':'');block.appendChild(small);list.appendChild(block)
+  }
+ }
+ if(data.entitlements?.length){const list=el('library-access');list.replaceChildren();for(const item of data.entitlements)para(list,(item.entitlement_key||'Library')+' · '+(item.status||'Unknown'))}
+ if(data.licenses?.length){el('account-license-card').hidden=false;for(const item of data.licenses)para(el('account-licenses'),(item.name||'License')+' · '+(item.status||'Unknown'))}
 }
-retry?.addEventListener('click',savePending);
-if(pending)savePending();
+async function savePending(){
+ const pending=sessionStorage.getItem('allie_pending_quiz_result');
+ if(!pending||el('account-member').hidden)return;
+ el('pending-save').hidden=false;el('retry-save').hidden=true;el('pending-save-status').textContent='Saving your quiz results…';
+ try{
+  const r=await fetch('/api/quiz/save',{method:'POST',headers:{'Content-Type':'application/json'},credentials:'same-origin',body:pending});
+  if(!r.ok)throw new Error('Save failed');
+  sessionStorage.removeItem('allie_pending_quiz_result');
+  el('pending-save-status').textContent='Results saved. Refresh this page to see them in your history.';
+ }catch{
+  el('pending-save-status').textContent='Could not save results yet. They are retained in this browser tab.';
+  el('retry-save').hidden=false;
+ }
+}
+el('retry-save').addEventListener('click',savePending);
+(async()=>{
+ try{
+  const response=await fetch('/api/account/summary',{headers:{Accept:'application/json'},credentials:'same-origin',cache:'no-store'});
+  if(response.status===401){show('account-guest');return}
+  const data=await response.json();
+  if(data.authenticated){renderAccount(data);await savePending()}
+  else{show('account-guest');if(data.unavailable)para(el('account-guest'),data.message||'Account service is currently unavailable.')}
+ }catch{
+  show('account-guest');para(el('account-guest'),'Account details are temporarily unavailable. You can still take the quiz.');
+ }
+})();
 </script>
