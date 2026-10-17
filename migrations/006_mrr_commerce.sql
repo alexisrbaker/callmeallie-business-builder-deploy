@@ -52,4 +52,3 @@ VALUES('rule_mrr_library','product_business_builder_mrr','business_builder_libra
 
 INSERT OR IGNORE INTO product_entitlement_rules(id,product_id,entitlement_key)
 VALUES('rule_mrr_package','product_business_builder_mrr','business_builder_mrr_package');
-
