@@ -1,0 +1,3 @@
+This ZIP contains the v0.34 website source only.
+The Windows installer and bundled Node runtime were intentionally excluded.
+Extract this ZIP, then upload the CONTENTS of the extracted folder to the root of the GitHub repository.
