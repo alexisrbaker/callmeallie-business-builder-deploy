@@ -34,4 +34,3 @@ VALUES(
 
 INSERT OR IGNORE INTO site_settings(key,value) VALUES('content_mrr_monthly_fee_cents','2500');
 INSERT OR IGNORE INTO site_settings(key,value) VALUES('content_mrr_stripe_price_id','');
-
