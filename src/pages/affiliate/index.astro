@@ -1,4 +1,17 @@
 ---
 import '../../styles/site.css';
+import {dbFrom} from '../../lib/db.js';import {getCurrentUser} from '../../lib/auth.js';import {getAffiliate,refreshAccount} from '../../lib/affiliate-connect.js';
+const db=dbFrom(Astro.locals),user=await getCurrentUser(db,Astro.request,Astro.locals);
+let a=user?await getAffiliate(db,user.id):null;
+if(a?.stripe_account_id&&Astro.locals?.runtime?.env?.STRIPE_SECRET_KEY){try{a=await refreshAccount(db,Astro.locals.runtime.env.STRIPE_SECRET_KEY,a)}catch{}}
+const ready=a?.status==='active'&&a?.stripe_charges_enabled&&a?.stripe_payouts_enabled;
+const sales=a?await db.prepare(`SELECT c.amount_cents,c.reversed_cents,c.status,o.product_id,o.created_at FROM commissions c JOIN orders o ON o.id=c.order_id WHERE c.affiliate_id=? ORDER BY o.created_at DESC LIMIT 50`).bind(a.id).all():{results:[]};
+const origin=Astro.url.origin;
 ---
-<main><a href="/">← Home</a><h1>Affiliate Center</h1><section class="card"><h2>Call Me Allie affiliate program</h2><p>Eligible upfront Business Builder and MRR package sales can earn commission under the current affiliate terms. Recurring MRR license fees are excluded.</p><form method="post" action="/api/affiliate/enroll"><button>Enroll / open affiliate account</button></form></section><section class="card"><h2>Your referral link</h2><p>Once approved, your account receives a persistent referral code and Stripe payout connection.</p></section></main>
+<main><a href="/">← Home</a><h1>Affiliate Center</h1><p>Earn 50% of eligible $46 library and $460 MRR package purchases. The ongoing commercial-license subscription does not pay an affiliate commission.</p>
+{!user?<p><a href="/login?next=/affiliate">Log in to apply</a></p>:!a?<form method="post" action="/api/affiliate/enroll"><button>Apply to be an affiliate</button></form>:<>
+<section class="card"><p>Application: <strong>{a.status}</strong></p><p>Stripe onboarding: {a.stripe_details_submitted?'Details submitted':'Not finished'}; charges {a.stripe_charges_enabled?'enabled':'not enabled'}; payouts {a.stripe_payouts_enabled?'enabled':'not enabled'}.</p><form method="post" action="/api/affiliate/connect"><button>{a.stripe_account_id?'Continue Stripe onboarding':'Connect Stripe'}</button></form><p>Stripe onboarding alone does not approve an affiliate application. Your links work only after approval and payment readiness.</p></section>
+{ready&&<section class="card"><h2>Your links</h2><p>Business Builder: <code>{origin}/library?aff={a.public_code}</code></p><p>MRR package: <code>{origin}/mrr?aff={a.public_code}</code></p></section>}
+<section class="card"><h2>Recorded commissions</h2><p>Stripe manages actual connected-account transfers and payout timing. These records show commissions from completed purchases, less recorded reversals.</p>{(sales.results||[]).map(c=><p>{c.product_id}: ${((c.amount_cents-c.reversed_cents)/100).toFixed(2)} ({c.status})</p>)}</section>
+</>}
+</main>
