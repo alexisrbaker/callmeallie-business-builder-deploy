@@ -1,5 +1,5 @@
 name = "call-me-allie-business"
-main = "./dist/server/entry.mjs"
+main = "@astrojs/cloudflare/entrypoints/server"
 compatibility_date = "2026-10-10"
 
 # Customer deployment: Wrangler / Workers Builds provisions these resources.
