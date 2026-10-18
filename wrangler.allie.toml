@@ -1,7 +1,7 @@
 # Allie's existing resources. This is NOT the customer distribution config.
 # Keep the existing shared identity DB read-only until authentication integration is verified.
 name = "allie-business"
-main = "@astrojs/cloudflare/entrypoints/server"
+main = "./dist/server/entry.mjs"
 compatibility_date = "2026-10-10"
 
 [assets]
