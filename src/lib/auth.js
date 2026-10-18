@@ -79,7 +79,7 @@ export async function logoutUser(db,request,locals){
   for(const sid of [...new Set([...getCookies(request,SHARED_COOKIE),...getCookies(request,LEGACY_SHARED_COOKIE)])]){
    await identity.prepare('DELETE FROM sessions WHERE id=?').bind(sid).run();
   }
-  return clearSessionCookie(request,{shared:true})+', '+clearSessionCookie(request);
+  return [clearSessionCookie(request,{shared:true}),clearSessionCookie(request)];
  }
  return clearSessionCookie(request);
 }
