@@ -42,8 +42,8 @@ export async function loginUser(db,request,locals,email,password){
   if(u){
    if(!await verifySharedPassword(password,u.password_hash,u.password_salt))return null;
    const business=await syncBusinessUser(db,u,{owner:['owner','admin'].includes(u.role)});
-   const sid=await createSession(db,business.id);
-   return {user:business,cookie:sessionCookie(sid,request)};
+   const sid=await createSession(identity,u.id,{shared:true});
+   return {user:business,cookie:sessionCookie(sid,request,{shared:true})};
   }
  }
  const u=await db.prepare(`SELECT id,email,display_name,password_hash,status,is_owner FROM users WHERE lower(email)=? LIMIT 1`).bind(email).first();
@@ -63,8 +63,8 @@ export async function registerUser(db,request,locals,email,name,password,{owner=
   const id=String(r.meta.last_row_id);
   const sharedUser={id,email,display_name:name,role};
   const businessUser=await syncBusinessUser(db,sharedUser,{owner});
-  const session=await createSession(db,businessUser.id);
-  return {user:businessUser,cookie:sessionCookie(session,request)};
+  const session=await createSession(identity,id,{shared:true});
+  return {user:businessUser,cookie:sessionCookie(session,request,{shared:true})};
  }
  const id=randomId(),hash=await hashPassword(password);
  await db.prepare('INSERT INTO users(id,email,display_name,password_hash,is_owner) VALUES(?,?,?,?,?)').bind(id,email,name,hash,owner?1:0).run();
@@ -72,7 +72,14 @@ export async function registerUser(db,request,locals,email,name,password,{owner=
  return {user:{id,email,display_name:name,is_owner:owner?1:0},cookie:sessionCookie(session,request)};
 }
 export async function logoutUser(db,request,locals){
- const sid=getCookie(request);
- if(db&&sid)await db.prepare('DELETE FROM sessions WHERE id=?').bind(sid).run();
+ const identity=locals?.runtime?.env?.IDENTITY_DB||null;
+ const localId=getCookie(request);
+ if(db&&localId)await db.prepare('DELETE FROM sessions WHERE id=?').bind(localId).run();
+ if(identity){
+  for(const sid of [...new Set([...getCookies(request,SHARED_COOKIE),...getCookies(request,LEGACY_SHARED_COOKIE)])]){
+   await identity.prepare('DELETE FROM sessions WHERE id=?').bind(sid).run();
+  }
+  return clearSessionCookie(request,{shared:true})+', '+clearSessionCookie(request);
+ }
  return clearSessionCookie(request);
 }
