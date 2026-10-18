@@ -8,7 +8,7 @@
   },
   "scripts": {
     "dev": "astro dev",
-    "build": "node scripts/assemble-guides.mjs && astro build",
+    "build": "node scripts/assemble-guides.mjs && astro build && node scripts/prepare-wrangler-deploy.mjs",
     "preview": "astro preview",
     "deploy": "npm run build && wrangler deploy && wrangler d1 migrations apply DB --remote",
     "deploy:allie": "npm run build && wrangler d1 migrations apply DB --remote --config wrangler.allie.toml && wrangler deploy --config wrangler.allie.toml",
