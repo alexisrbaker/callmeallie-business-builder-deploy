@@ -13,7 +13,7 @@ export const POST=async({request,locals})=>{
   let auth;
   if(hasSharedIdentity(locals)){
    auth=await loginUser(db,request,locals,email,password);
-   if(!auth || !['owner','admin'].includes(auth.user.role))return new Response('Sign in with your existing Publishing owner/admin account.',{status:401});
+   if(!auth || !auth.user.is_owner)return new Response('Sign in with your existing Publishing owner/admin account.',{status:401});
    await db.prepare('UPDATE users SET is_owner=1 WHERE id=?').bind(auth.user.id).run();
   }else{
    auth=await registerUser(db,request,locals,email,name,password,{owner:true});
