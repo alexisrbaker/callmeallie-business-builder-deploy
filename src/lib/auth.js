@@ -53,14 +53,23 @@ export async function loginUser(db,request,locals,email,password){
 }
 export async function registerUser(db,request,locals,email,name,password,{owner=false}={}){
  if(!db)throw new Error('business_database_unavailable');
- if(locals?.runtime?.env?.IDENTITY_DB){
-  const identityUser=await locals.runtime.env.IDENTITY_DB.prepare('SELECT id FROM users WHERE lower(email)=? LIMIT 1').bind(email).first();
-  if(identityUser)throw new Error('account_exists_in_publishing');
+ const identity=locals?.runtime?.env?.IDENTITY_DB||null;
+ if(identity){
+  const exists=await identity.prepare('SELECT id FROM users WHERE lower(email)=? LIMIT 1').bind(email).first();
+  if(exists)throw new Error('account_exists');
+  const pw=await hashSharedPassword(password);
+  const role=owner?'owner':'reader';
+  const r=await identity.prepare(`INSERT INTO users(email,display_name,role,password_hash,password_salt,membership_tier,subscription_status,monthly_support_cents) VALUES(?,?,?,?,?,'free','none',0)`).bind(email,name,role,pw.hash,pw.salt).run();
+  const id=String(r.meta.last_row_id);
+  const sharedUser={id,email,display_name:name,role};
+  const businessUser=await syncBusinessUser(db,sharedUser,{owner});
+  const session=await createSession(db,businessUser.id);
+  return {user:businessUser,cookie:sessionCookie(session,request)};
  }
  const id=randomId(),hash=await hashPassword(password);
- await db.prepare(`INSERT INTO users(id,email,display_name,password_hash,is_owner) VALUES(?,?,?,?,?)`).bind(id,email,name,hash,owner?1:0).run();
- const sid=await createSession(db,id);
- return {user:{id,email,display_name:name,is_owner:owner?1:0},cookie:sessionCookie(sid,request)};
+ await db.prepare('INSERT INTO users(id,email,display_name,password_hash,is_owner) VALUES(?,?,?,?,?)').bind(id,email,name,hash,owner?1:0).run();
+ const session=await createSession(db,id);
+ return {user:{id,email,display_name:name,is_owner:owner?1:0},cookie:sessionCookie(session,request)};
 }
 export async function logoutUser(db,request,locals){
  const sid=getCookie(request);
